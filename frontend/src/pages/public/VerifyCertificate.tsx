@@ -7,7 +7,7 @@ import axios from 'axios';
 // Since this is a public endpoint and doesn't need auth tokens,
 // we can use standard axios if our api wrapper forces redirects on 401.
 // But we'll try to use the api wrapper first, or just raw axios to be safe since it's a public route.
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const VerifyCertificate: React.FC = () => {
   const { token } = useParams<{ token: string }>();
