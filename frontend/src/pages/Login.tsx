@@ -36,10 +36,21 @@ const Login: React.FC<LoginProps> = ({ onLogin, onNavigateToSignup, onBackToLand
       }
 
       const response = await api.post(endpoint, payload);
-      const { accessToken, role: userRole } = response.data;
+      console.log('[Login Response]', response.data);
+      
+      // Robust extraction: support both top-level and nested 'data' structures
+      const data = response.data.data || response.data;
+      const accessToken = data.accessToken || data.token;
+      const userRole = data.role;
+
+      if (!accessToken || !userRole) {
+          console.error('[Login Error] Missing token or role in response:', data);
+          setError('Invalid server response: missing credentials.');
+          return;
+      }
       
       localStorage.setItem('token', accessToken);
-      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('user', JSON.stringify(data));
       
       onLogin(userRole);
     } catch (err: any) {

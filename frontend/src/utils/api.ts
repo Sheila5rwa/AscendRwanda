@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import axios, { InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 const isProd = import.meta.env.PROD;
 const API_URL = isProd ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:3000/api');
@@ -11,12 +11,19 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem('token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.response.use(
+  (response) => {
+    console.log(`[API Success] ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
+    return response;
+  },
+  (error) => {
+    console.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default api;
