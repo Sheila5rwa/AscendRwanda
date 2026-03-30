@@ -19,8 +19,9 @@ router.put('/unflag/:student_id', controller.unflagStudent);                   /
 router.get('/assignments/:id', controller.getMentorshipById);                  // GET  /api/mentors/assignments/:id
 router.delete('/assignments/:id', controller.removeMentorship);               // DELETE /api/mentors/assignments/:id
 
-// FR 4: Notes
-router.post('/note', [...mentorNoteRules, validate], controller.addMentorNote); // POST /api/mentors/note
+// FR 4: Messaging
+router.post('/note', [...mentorNoteRules, validate], controller.addMentorNote); // POST /api/mentors/note (Private)
+router.post('/message', controller.sendStudentMessage);                        // POST /api/mentors/message (Public to Student)
 
 // Legacy admin-triggered assign (admin route preferred)
 router.post('/assign', controller.assignMentor);                               // POST /api/mentors/assign

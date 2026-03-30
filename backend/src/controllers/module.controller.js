@@ -18,6 +18,18 @@ exports.createModule = async (req, res) => {
 exports.getAllModules = async (req, res) => {
   try {
     const modules = await Module.findAll({
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM student_progress AS p
+              WHERE p.module_id = LearningModule.module_id
+            )`),
+            'studentCount'
+          ]
+        ]
+      },
       include: [{ model: Content, include: [Question] }],
       order: [['created_at', 'ASC']],
     });

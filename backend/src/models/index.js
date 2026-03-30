@@ -98,10 +98,12 @@ db.User.hasMany(db.Mentorship, { as: 'AssignedMentors',  foreignKey: 'student_id
 db.Mentorship.belongsTo(db.User, { as: 'Mentor',  foreignKey: 'mentor_id' });
 db.Mentorship.belongsTo(db.User, { as: 'Student', foreignKey: 'student_id' });
 
-// ── Employer ↔ Student Interactions ──────────────────────────────────────
+// ── Employer/Mentor ↔ Student Interactions ────────────────────────────────
 db.User.hasMany(db.Interaction, { as: 'EmployerInteractions', foreignKey: 'employer_id' });
+db.User.hasMany(db.Interaction, { as: 'MentorInteractions',   foreignKey: 'mentor_id' });
 db.User.hasMany(db.Interaction, { as: 'StudentInteractions',  foreignKey: 'student_id' });
 db.Interaction.belongsTo(db.User, { as: 'Employer', foreignKey: 'employer_id' });
+db.Interaction.belongsTo(db.User, { as: 'Mentor',   foreignKey: 'mentor_id' });
 db.Interaction.belongsTo(db.User, { as: 'Student',  foreignKey: 'student_id' });
 
 module.exports = db;

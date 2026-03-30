@@ -10,20 +10,20 @@ import AdminModules from './pages/admin/AdminModules';
 import AdminEmployers from './pages/admin/AdminEmployers';
 import AdminCertification from './pages/admin/Certification';
 import AdminMessages from './pages/admin/AdminMessages';
-import Administration from './pages/admin/Administration';
 
 // Mentor Pages
 import MentorDashboard from './pages/mentor/Dashboard';
 
 // Student Pages
 import StudentDashboard from './pages/student/Dashboard';
+import LearningModules from './pages/student/LearningModules';
+import LearningContent from './pages/student/LearningContent';
+import CertificateView from './pages/student/CertificateView';
 
 // Employer Pages
 import EmployerDashboard from './pages/employer/Dashboard';
 
 // Shared/Common
-import Messages from './pages/Messages';
-import Meetings from './pages/Meetings';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Enrollment from './pages/Enrollment';
@@ -37,20 +37,31 @@ const ProtectedRoute: React.FC<{ isAuthenticated: boolean; children: React.React
 };
 
 // ─── Shell Layout (sidebar + topbar) ─────────────────────────────────────────
-const pageTitles: Record<string, string> = {
-  '/admin/dashboard':      'Dashboard',
-  '/admin/students':       'Students',
-  '/admin/modules':        'Learning Modules',
-  '/admin/employers':      'Employer Management',
-  '/admin/certification':  'Certification',
-  '/admin/messages':       'Messages',
-  '/admin/administration': 'Administration',
-  '/mentor/dashboard':     'Mentor Dashboard',
-  '/student/dashboard':    'My Learning Portal',
-  '/employer/dashboard':   'Employer Portal',
-  '/messages':             'Messages',
-  '/meetings':             'Meetings',
-  '/profile':              'My Profile',
+const portalHeaders: Record<string, { title: string; description: string }> = {
+  '/admin/dashboard':      { title: 'Admin Console',       description: 'System Overview & KPIs' },
+  '/admin/students':       { title: 'User Management',     description: 'Review and support platform users' },
+  '/admin/modules':        { title: 'Learning Management', description: 'Curate educational content' },
+  '/admin/employers':      { title: 'Partnerships',        description: 'Connect students to industry' },
+  '/admin/certification':  { title: 'Certification Hub',   description: 'Manage and issue credentials' },
+  '/admin/messages':       { title: 'Support Inbox',       description: 'Platform wide communication' },
+  
+  '/mentor/dashboard':     { title: 'Mentor Portal',       description: 'Guiding the next generation' },
+  '/mentor/students':      { title: 'My Learners',         description: 'Track and support your assigned students' },
+  '/mentor/messages':      { title: 'Inquiries',           description: 'Student & Admin messages' },
+  '/mentor/modules':       { title: 'Content Preparation', description: 'Review and improve teaching materials' },
+
+  '/student/overview':     { title: 'Student Dashboard',   description: 'Your learning overview' },
+  '/student/my-courses':   { title: 'My Training',        description: 'Continue your learning journey' },
+  '/student/modules':      { title: 'Explore Catalog',    description: 'Find new training modules' },
+  '/student/quizzes':      { title: 'Learning Assessment',description: 'Track your quiz and exam results' },
+  '/student/certificates': { title: 'Credentials',        description: 'Your earned certificates' },
+  '/student/messages':     { title: 'Communication Hub',   description: 'Employer & Mentor interactions' },
+  '/student/learning':     { title: 'Learning Lab',        description: 'Mastering your skills' },
+  '/student/certificate':  { title: 'Official Credential', description: 'Your verified achievement' },
+
+  '/employer/dashboard':   { title: 'Employer Portal',     description: 'Connect with certified students' },
+  '/employer/students':    { title: 'Candidate Search',    description: 'Find top talent for your needs' },
+  '/employer/interactions':{ title: 'Engagement Log',      description: 'Track your hiring journey' },
 };
 
 const Shell: React.FC<{
@@ -59,14 +70,19 @@ const Shell: React.FC<{
   children: React.ReactNode;
 }> = ({ role, onLogout, children }) => {
   const location = useLocation();
-  const subtitle = pageTitles[location.pathname] ?? 'Ascend Rwanda';
+  const header = portalHeaders[location.pathname] || { title: 'Ascend Rwanda', description: 'Welcome back' };
 
   return (
     <div className="min-h-screen bg-[#eef0f8] flex items-center justify-center p-4">
       <div className="w-full max-w-[1350px] h-[820px] bg-white rounded-3xl shadow-2xl flex overflow-hidden">
         <Sidebar role={role} onLogout={onLogout} />
         <div className="flex-1 flex flex-col overflow-hidden bg-[#f5f7fb]">
-          <TopBar subtitle={subtitle} role={role} onLogout={onLogout} />
+          <TopBar 
+            title={header.title} 
+            description={header.description} 
+            role={role} 
+            onLogout={onLogout} 
+          />
           <div className="flex-1 px-6 pt-3 overflow-hidden">
             {children}
           </div>
@@ -116,7 +132,7 @@ const App: React.FC = () => {
     navigate('/', { replace: true });
   };
 
-  const dashboardRoute = `/${role}/dashboard`;
+  const dashboardRoute = role === 'student' ? '/student/overview' : `/${role}/dashboard`;
 
   return (
     <Routes>
@@ -144,7 +160,6 @@ const App: React.FC = () => {
               <Route path="employers"      element={<AdminEmployers />} />
               <Route path="certification"  element={<AdminCertification />} />
               <Route path="messages"       element={<AdminMessages />} />
-              <Route path="administration" element={<Administration />} />
               <Route path="profile"        element={<Profile role={role} />} />
               <Route index                 element={<Navigate to="dashboard" replace />} />
             </Routes>
@@ -158,8 +173,9 @@ const App: React.FC = () => {
           <Shell role={role} onLogout={handleLogout}>
             <Routes>
               <Route path="dashboard" element={<MentorDashboard />} />
-              <Route path="messages"  element={<Messages />} />
-              <Route path="meetings"  element={<Meetings />} />
+              <Route path="students"  element={<MentorDashboard />} />
+              <Route path="messages"  element={<MentorDashboard />} />
+              <Route path="modules"   element={<AdminModules />} />
               <Route path="profile"   element={<Profile role={role} />} />
               <Route index            element={<Navigate to="dashboard" replace />} />
             </Routes>
@@ -172,10 +188,17 @@ const App: React.FC = () => {
         <ProtectedRoute isAuthenticated={isAuthenticated && role === 'student'}>
           <Shell role={role} onLogout={handleLogout}>
             <Routes>
-              <Route path="dashboard" element={<StudentDashboard />} />
-              <Route path="messages"  element={<Messages />} />
+              <Route path="dashboard" element={<Navigate to="/student/overview" replace />} />
+              <Route path="overview"  element={<StudentDashboard />} />
+              <Route path="my-courses"element={<StudentDashboard />} />
+              <Route path="modules"   element={<LearningModules />} />
+              <Route path="quizzes"   element={<StudentDashboard />} />
+              <Route path="certificates" element={<StudentDashboard />} />
+              <Route path="certificate/:id" element={<CertificateView />} />
+              <Route path="messages"  element={<StudentDashboard />} />
+              <Route path="learning/:moduleId/:contentId" element={<LearningContent />} />
               <Route path="profile"   element={<Profile role={role} />} />
-              <Route index            element={<Navigate to="dashboard" replace />} />
+              <Route index            element={<Navigate to="overview" replace />} />
             </Routes>
           </Shell>
         </ProtectedRoute>
@@ -186,9 +209,10 @@ const App: React.FC = () => {
         <ProtectedRoute isAuthenticated={isAuthenticated && role === 'employer'}>
           <Shell role={role} onLogout={handleLogout}>
             <Routes>
-              <Route path="dashboard" element={<EmployerDashboard />} />
-              <Route path="messages"  element={<Messages />} />
-              <Route path="profile"   element={<Profile role={role} />} />
+              <Route path="dashboard"    element={<EmployerDashboard />} />
+              <Route path="students"     element={<EmployerDashboard />} />
+              <Route path="interactions" element={<EmployerDashboard />} />
+              <Route path="profile"      element={<Profile role={role} />} />
               <Route index            element={<Navigate to="dashboard" replace />} />
             </Routes>
           </Shell>

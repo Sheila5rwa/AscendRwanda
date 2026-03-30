@@ -101,6 +101,7 @@ exports.submitAttempt = async (req, res) => {
       student_id: req.userId,
       content_id,
       score,
+      total_possible: totalPossible,
       answers,
       attempted_at: new Date(),
       completed_at: new Date(),
@@ -109,22 +110,30 @@ exports.submitAttempt = async (req, res) => {
     let certificate = null;
     let flagged = false;
 
-    // If exam, handle pass/fail
-    if (content.content_type === 'exam') {
-      if (percentage >= PASS_THRESHOLD) {
-        // Mark module as completed with score
-        await Progress.update(
-          { status: 'completed', completed_at: new Date(), score, flagged: false },
-          { where: { student_id: req.userId, module_id: content.module_id } }
-        );
+    if (percentage >= PASS_THRESHOLD) {
+      // Mark specific content as completed
+      const progress = await Progress.findOne({ where: { student_id: req.userId, module_id: content.module_id } });
+      if (progress) {
+        let completed = progress.completed_contents || [];
+        if (typeof completed === 'string') completed = JSON.parse(completed);
+        if (!completed.includes(content_id)) {
+          completed.push(content_id);
+          await progress.update({ 
+            status: content.content_type === 'exam' ? 'completed' : progress.status,
+            completed_at: content.content_type === 'exam' ? new Date() : progress.completed_at,
+            completed_contents: completed 
+          });
+        }
+      }
 
-        // FR 3.1: Auto-generate certificate with QR token
+      // Handle Exam Certificates
+      if (content.content_type === 'exam') {
         const existingCert = await Certificate.findOne({
           where: { student_id: req.userId, module_id: content.module_id },
         });
 
         if (!existingCert) {
-          const qrToken = uuidv4(); // Store token, not data URL
+          const qrToken = uuidv4();
           certificate = await Certificate.create({
             student_id: req.userId,
             module_id: content.module_id,
@@ -134,19 +143,17 @@ exports.submitAttempt = async (req, res) => {
         } else {
           certificate = existingCert;
         }
-      } else if (percentage < 50) {
-        // Flag for mentor intervention
-        flagged = true;
-        await Progress.update(
-          { flagged: true },
-          { where: { student_id: req.userId, module_id: content.module_id } }
-        );
-        // Also flag on mentorship record if one exists
-        await db.Mentorship.update(
-          { flagged: true },
-          { where: { student_id: req.userId } }
-        );
       }
+    } else if (percentage < 50 && content.content_type === 'exam') {
+      flagged = true;
+      await Progress.update(
+        { flagged: true },
+        { where: { student_id: req.userId, module_id: content.module_id } }
+      );
+      await db.Mentorship.update(
+        { flagged: true },
+        { where: { student_id: req.userId } }
+      );
     }
 
     res.status(200).json({
@@ -160,6 +167,37 @@ exports.submitAttempt = async (req, res) => {
         ? { certificate_id: certificate.certificate_id, issued_at: certificate.issued_at }
         : null,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ─── FR 5.1: Mark Content as Completed (Read Note / Pass Quiz) ────────────────
+exports.completeContent = async (req, res) => {
+  try {
+    const { content_id } = req.body;
+    if (!content_id) return res.status(400).json({ message: 'content_id is required.' });
+
+    const content = await Content.findByPk(content_id);
+    if (!content) return res.status(404).json({ message: 'Content not found.' });
+
+    const progress = await Progress.findOne({
+      where: { student_id: req.userId, module_id: content.module_id },
+    });
+
+    if (!progress) {
+      return res.status(404).json({ message: 'No progress record found. Start the module first.' });
+    }
+
+    let completed = progress.completed_contents || [];
+    if (typeof completed === 'string') completed = JSON.parse(completed);
+    
+    if (!completed.includes(content_id)) {
+      completed.push(content_id);
+      await progress.update({ completed_contents: completed });
+    }
+
+    res.status(200).json({ message: 'Content marked as completed.', completed_contents: completed });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -258,8 +296,13 @@ exports.getStudentInteractions = async (req, res) => {
       where: { student_id: req.userId },
       include: [
         {
-          model: User,
+          model: db.User,
           as: 'Employer',
+          attributes: ['user_id', 'first_name', 'last_name', 'email'],
+        },
+        {
+          model: db.User,
+          as: 'Mentor',
           attributes: ['user_id', 'first_name', 'last_name', 'email'],
         },
       ],

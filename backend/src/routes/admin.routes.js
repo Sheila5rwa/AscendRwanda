@@ -21,5 +21,6 @@ router.get('/stats', controller.getDashboardStats);                   // GET /ap
 
 // All student progress (FR 5.1 admin view)
 router.get('/progress', controller.getAllStudentProgress);            // GET /api/admin/progress
+router.get('/certificates', controller.getAllCertificates);        // GET /api/admin/certificates
 
 module.exports = router;

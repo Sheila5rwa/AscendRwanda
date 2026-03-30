@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
     },
     title: { type: DataTypes.STRING(100), allowNull: false },
+    image_url: { type: DataTypes.STRING(255) },
     description: { type: DataTypes.TEXT },
     language: { type: DataTypes.ENUM('Kinyarwanda', 'English'), defaultValue: 'English' },
     duration_minutes: { type: DataTypes.INTEGER },

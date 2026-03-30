@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    employer_id: { type: DataTypes.INTEGER, allowNull: false },
+    employer_id: { type: DataTypes.INTEGER, allowNull: true },
+    mentor_id: { type: DataTypes.INTEGER, allowNull: true },
     student_id: { type: DataTypes.INTEGER, allowNull: false },
     interaction_type: {
       type: DataTypes.ENUM('message', 'interview', 'feedback', 'selection'),

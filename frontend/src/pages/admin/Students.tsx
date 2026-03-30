@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Search, AlertTriangle, CheckCircle, Plus,
-  Edit3, Trash2, X, Save, Eye, Phone, Mail, Calendar, Key
+  Edit3, Trash2, X, Save, Eye, Phone, Mail, Calendar, Key, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import api from '../../utils/api';
 
@@ -185,6 +185,9 @@ const Students: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'student' | 'mentor' | 'employer'>('all');
   const [showRegister, setShowRegister] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchUsers = async () => {
     try {
@@ -217,6 +220,13 @@ const Students: React.FC = () => {
       return q;
     });
 
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filter]);
+
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Stats */}
@@ -224,7 +234,7 @@ const Students: React.FC = () => {
         {[
           { label: 'Total Users', value: users.length, color: 'bg-gradient-to-br from-blue-500 to-blue-700', icon: '👥' },
           { label: 'Students', value: users.filter(s => s.role === 'student').length, color: 'bg-gradient-to-br from-emerald-500 to-emerald-700', icon: '🎓' },
-          { label: 'Mentors', value: users.filter(s => s.role === 'mentor').length, color: 'bg-gradient-to-br from-purple-500 to-purple-700', icon: '👨‍🏫' },
+          { label: 'Mentors', value: users.filter(s => s.role === 'mentor').length, color: 'bg- gradient-to-br from-purple-500 to-purple-700', icon: '👨‍🏫' },
           { label: 'Employers', value: users.filter(s => s.role === 'employer').length, color: 'bg-gradient-to-br from-orange-500 to-orange-700', icon: '🏢' },
         ].map(stat => (
           <div key={stat.label} className={`${stat.color} rounded-2xl p-4 text-white shadow`}>
@@ -252,7 +262,7 @@ const Students: React.FC = () => {
         </div>
 
         <button onClick={() => setShowRegister(true)} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition shadow">
-          <Plus className="w-4 h-4" /> Register Student
+          <Plus className="w-4 h-4" /> Add User
         </button>
       </div>
 
@@ -269,7 +279,7 @@ const Students: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {filtered.map((s: any, i: number) => (
+            {paginated.map((s: any) => (
               <tr key={s.user_id} className="hover:bg-gray-50/70 transition-colors group">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
@@ -309,6 +319,25 @@ const Students: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-2 bg-white border-t border-gray-100 mt-2 rounded-xl shadow-sm flex-shrink-0">
+          <p className="text-[10px] text-gray-400">
+            Showing <span className="font-bold text-gray-600">{((currentPage - 1) * itemsPerPage) + 1}</span>-
+            <span className="font-bold text-gray-600">{Math.min(currentPage * itemsPerPage, filtered.length)}</span> of {filtered.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-20 transition-all"><ChevronLeft className="w-4 h-4" /></button>
+            <div className="flex gap-1">
+              {[...Array(totalPages)].map((_, i) => (
+                <button key={i} onClick={() => setCurrentPage(i + 1)} className={`w-7 h-7 rounded-lg text-[10px] font-bold transition-all ${currentPage === i + 1 ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:bg-gray-100'}`}>{i + 1}</button>
+              ))}
+            </div>
+            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-20 transition-all"><ChevronRight className="w-4 h-4" /></button>
+          </div>
+        </div>
+      )}
 
       {showRegister && <RegisterModal onClose={() => setShowRegister(false)} onRefresh={fetchUsers} />}
       {selectedStudent && <StudentDetail student={selectedStudent} onClose={() => setSelectedStudent(null)} />}

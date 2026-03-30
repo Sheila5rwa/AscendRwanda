@@ -52,11 +52,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="h-full overflow-y-auto pr-1 pb-4">
-      {/* Header */}
-      <div className="mb-5">
-        <h2 className="text-xl font-bold text-gray-800">Admin Dashboard</h2>
-        <p className="text-gray-500 text-sm">Welcome back, {user.first_name} {user.last_name}</p>
-      </div>
+      {/* Header */} 
 
       {/* Stat cards */}
       <div className="grid grid-cols-4 gap-3 mb-5">

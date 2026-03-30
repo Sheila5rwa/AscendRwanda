@@ -6,13 +6,11 @@ import {
   Users,
   GraduationCap,
   MessageSquare,
-  Briefcase,
-  UserCheck,
   Award,
-  Settings,
   LogOut,
-  FileText,
   User,
+  Play,
+  FileText,
 } from 'lucide-react';
 
 export type UserRole = 'admin' | 'mentor' | 'employer' | 'student';
@@ -33,21 +31,25 @@ const allNavItems: {
   { path: '/admin/students',        label: 'Users',           icon: Users,           roles: ['admin'] },
   { path: '/admin/modules',         label: 'Modules',         icon: BookOpen,        roles: ['admin'] },
   { path: '/admin/certification',   label: 'Certification',   icon: Award,           roles: ['admin'] },
-  { path: '/admin/messages',        label: 'Messages',        icon: MessageSquare,   roles: ['admin'] },
-  { path: '/admin/administration',  label: 'Administration',  icon: Settings,        roles: ['admin'] },
 
   // Mentor
-  { path: '/mentor/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['mentor'] },
-  { path: '/mentor/messages',  label: 'Messages',  icon: MessageSquare,   roles: ['mentor'] },
-  { path: '/mentor/meetings',  label: 'Meetings',  icon: UserCheck,       roles: ['mentor'] },
+  { path: '/mentor/dashboard', label: 'Dashboard',   icon: LayoutDashboard, roles: ['mentor'] },
+  { path: '/mentor/students',  label: 'My Students', icon: Users,           roles: ['mentor'] },
+  { path: '/mentor/messages',  label: 'Messages',    icon: MessageSquare,   roles: ['mentor'] },
+  { path: '/mentor/modules',   label: 'Modules',     icon: BookOpen,        roles: ['mentor'] },
 
   // Student
-  { path: '/student/dashboard', label: 'Dashboard',    icon: LayoutDashboard, roles: ['student'] },
-  { path: '/student/messages',  label: 'Messages',     icon: MessageSquare,   roles: ['student'] },
+  { path: '/student/overview',  label: 'Overview',      icon: LayoutDashboard, roles: ['student'] },
+  { path: '/student/my-courses',label: 'My Learning',   icon: Play,            roles: ['student'] },
+  { path: '/student/modules',   label: 'Explore Catalog', icon: BookOpen,        roles: ['student'] },
+  { path: '/student/quizzes',   label: 'Tests & Exams',  icon: FileText,        roles: ['student'] },
+  { path: '/student/certificates', label: 'Certificates', icon: Award,           roles: ['student'] },
+  { path: '/student/messages',  label: 'Messages',      icon: MessageSquare,   roles: ['student'] },
 
   // Employer
-  { path: '/employer/dashboard', label: 'Dashboard',     icon: LayoutDashboard, roles: ['employer'] },
-  { path: '/employer/messages',  label: 'Messages',      icon: MessageSquare,   roles: ['employer'] },
+  { path: '/employer/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, roles: ['employer'] },
+  { path: '/employer/students',     label: 'Student Pool', icon: Users,           roles: ['employer'] },
+  { path: '/employer/interactions', label: 'Interactions', icon: MessageSquare,   roles: ['employer'] },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {

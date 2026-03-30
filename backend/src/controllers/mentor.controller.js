@@ -133,7 +133,7 @@ exports.getStudentProgressForMentor = async (req, res) => {
   }
 };
 
-// ─── FR 4: Add / Update Mentor Note on a Student ─────────────────────────────
+// ─── FR 4: Add / Update Mentor Note (Private) ─────────────────────────────
 exports.addMentorNote = async (req, res) => {
   try {
     const { student_id, notes } = req.body;
@@ -144,7 +144,36 @@ exports.addMentorNote = async (req, res) => {
       return res.status(404).json({ message: 'No mentorship assignment found for this student.' });
     }
     await record.update({ notes });
-    res.status(200).json({ message: 'Note saved.', record });
+    res.status(200).json({ message: 'Internal note saved.', record });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ─── Send Message to Student (Public to Student) ────────────────────────────
+exports.sendStudentMessage = async (req, res) => {
+  try {
+    const { student_id, content } = req.body;
+    if (!student_id || !content) {
+      return res.status(400).json({ message: 'student_id and content are required.' });
+    }
+
+    // Verify assignment
+    const assignment = await Mentorship.findOne({
+      where: { mentor_id: req.userId, student_id },
+    });
+    if (!assignment) {
+      return res.status(403).json({ message: 'You are not assigned to this student.' });
+    }
+
+    const interaction = await db.Interaction.create({
+      mentor_id: req.userId,
+      student_id,
+      interaction_type: 'message',
+      content,
+    });
+
+    res.status(201).json({ message: 'Message sent to student dashboard.', interaction });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

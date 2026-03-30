@@ -4,6 +4,7 @@ import {
   CheckCircle, Briefcase, Filter, Plus, Loader2,
   Mail, Phone
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 
 const typeConfig: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
@@ -17,7 +18,10 @@ const avatarColors = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange
 type Tab = 'overview' | 'students' | 'interactions';
 
 const Dashboard: React.FC = () => {
-  const [tab, setTab]             = useState<Tab>('overview');
+  const location = useLocation();
+  const pathPart = location.pathname.split('/').pop();
+  const tab: Tab = (pathPart === 'students' || pathPart === 'interactions') ? pathPart : 'overview';
+  
   const [search, setSearch]       = useState('');
   const [skillFilter, setSkillFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -81,11 +85,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'overview',     label: '📊 My Dashboard' },
-    { id: 'students',     label: '👥 Student Pool' },
-    { id: 'interactions', label: '💬 My Interactions' },
-  ];
 
   if (loading) return (
     <div className="h-full flex items-center justify-center">
@@ -95,32 +94,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800">Employer Portal</h2>
-          <p className="text-gray-500 text-sm">Connect with certified students</p>
-        </div>
-        <button
-          onClick={() => setShowCompose(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-2 shadow"
-        >
-          <Plus className="w-4 h-4" /> New Interaction
-        </button>
-      </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-white rounded-xl p-1 mb-4 shadow-sm border border-gray-100 flex-shrink-0">
-        {tabs.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${tab === t.id ? 'bg-blue-600 text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+
 
       <div className="flex-1 overflow-y-auto pr-1 pb-4 space-y-4">
 
@@ -265,6 +240,13 @@ const Dashboard: React.FC = () => {
                   <button key={f} onClick={() => setTypeFilter(f)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${typeFilter === f ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50'}`}>{f}</button>
                 ))}
               </div>
+              <button 
+                onClick={() => setShowCompose(true)}
+                className="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 transition shadow shadow-blue-200"
+                title="New Interaction"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
             <div className="space-y-3">
               {filteredInteractions.length === 0 && (

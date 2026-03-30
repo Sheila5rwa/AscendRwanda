@@ -182,3 +182,20 @@ exports.getAllStudentProgress = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// ─── FR Admin: List All Certificates ──────────────────────────────────────────
+exports.getAllCertificates = async (req, res) => {
+  try {
+    const certs = await Certificate.findAll({
+      include: [
+        { model: User, attributes: ['first_name', 'last_name', 'user_id'] },
+        { model: Module, attributes: ['title'] },
+      ],
+      order: [['issued_at', 'DESC']],
+    });
+    res.status(200).json(certs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

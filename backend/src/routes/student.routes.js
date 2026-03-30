@@ -11,6 +11,7 @@ router.post('/complete-module', controller.completeModule);     // POST /api/stu
 
 // FR 2 / FR 3: Quiz/Exam submission with auto-cert
 router.post('/submit-attempt', controller.submitAttempt);       // POST /api/students/submit-attempt
+router.post('/content/complete', controller.completeContent);  // POST /api/students/content/complete
 
 // FR 5.1: Progress tracking
 router.get('/progress', controller.getStudentProgress);         // GET /api/students/progress

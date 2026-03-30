@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'not_started',
     },
     score: { type: DataTypes.INTEGER },
+    completed_contents: { type: DataTypes.JSON, defaultValue: [] },
     flagged: { type: DataTypes.BOOLEAN, defaultValue: false },
     started_at: { type: DataTypes.DATE },
     completed_at: { type: DataTypes.DATE },

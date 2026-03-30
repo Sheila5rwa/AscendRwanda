@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { UserRole } from './Sidebar';
 
 interface TopBarProps {
-  subtitle?: string;
+  title?: string;
+  description?: string;
   role: UserRole;
   onLogout: () => void;
 }
@@ -16,7 +17,7 @@ const avatarGradients: Record<UserRole, string> = {
   employer: 'from-orange-500 to-amber-600',
 };
 
-const TopBar: React.FC<TopBarProps> = ({ subtitle, role, onLogout }) => {
+const TopBar: React.FC<TopBarProps> = ({ title, description, role, onLogout }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
@@ -33,8 +34,8 @@ const TopBar: React.FC<TopBarProps> = ({ subtitle, role, onLogout }) => {
   return (
     <div className="flex items-center justify-between px-8 pt-6 pb-4 border-b border-gray-100 bg-white flex-shrink-0 relative">
       <div>
-        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Welcome back</p>
-        <h1 className="text-xl font-bold text-gray-800">{subtitle || 'Dashboard'}</h1>
+        <h1 className="text-xl font-bold text-gray-800">{title || 'Dashboard'}</h1> 
+        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">{description || 'Welcome back'}</p> 
       </div>
 
       <div className="flex items-center gap-4">
