@@ -14,11 +14,16 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet());
 
 // ─── NFR 1: CORS (restrict to known origins) ─────────────────────────────────
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000').split(',');
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(origin => origin.length > 0);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (curl, mobile apps, same-origin)
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn(`[CORS] Request from origin ${origin} rejected. Allowed: ${allowedOrigins.join(', ')}`);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,

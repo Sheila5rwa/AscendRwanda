@@ -19,7 +19,7 @@ services:
         value: "generate_a_secure_random_string_here_or_leave_as_is_"
       - key: ALLOWED_ORIGINS
         # Update this value to exactly match the deployed frontend URL once known
-        value: "https://ascend-rwanda-frontend.onrender.com" 
+        value: "https://ascend-rwanda-frontend.onrender.com"
 
   # ─── Frontend Web Service (SPA via Nginx) ─────────────────────────────
   - type: web
