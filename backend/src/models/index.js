@@ -7,7 +7,12 @@ let sequelize;
 
 if (process.env.DATABASE_URL) {
   // Use the connection URI provided by Render / Aiven
-  const dbUrl = process.env.DATABASE_URL.trim();
+  let dbUrl = process.env.DATABASE_URL.trim();
+  // Safeguard against 'ysql://' typo for 'mysql://'
+  if (dbUrl.startsWith('ysql://')) {
+    console.warn('[DB] Detected "ysql://" protocol – correcting to "mysql://".');
+    dbUrl = dbUrl.replace('ysql://', 'mysql://');
+  }
   sequelize = new Sequelize(dbUrl, {
     dialect: 'mysql',
     logging: false,
