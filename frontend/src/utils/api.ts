@@ -1,7 +1,8 @@
 /// <reference types="vite/client" />
 import axios, { InternalAxiosRequestConfig } from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const isProd = import.meta.env.PROD;
+const API_URL = isProd ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:3000/api');
 
 const api = axios.create({
   baseURL: API_URL,
