@@ -7,7 +7,8 @@ let sequelize;
 
 if (process.env.DATABASE_URL) {
   // Use the connection URI provided by Render / Aiven
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
+  const dbUrl = process.env.DATABASE_URL.trim();
+  sequelize = new Sequelize(dbUrl, {
     dialect: 'mysql',
     logging: false,
     dialectOptions: {
