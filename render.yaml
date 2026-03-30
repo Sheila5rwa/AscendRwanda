@@ -31,5 +31,5 @@ services:
     autoDeploy: true
     envVars:
       - key: VITE_API_URL
-        # This points to the deployed backend's API endpoint dynamically during Vite build
-        value: "https://ascend-rwanda-backend.onrender.com/api" 
+        # This points to the relative proxy path in Nginx to avoid CORS
+        value: "/api" 
