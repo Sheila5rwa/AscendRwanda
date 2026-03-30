@@ -1,0 +1,35 @@
+services:
+  # ─── API Backend Service ─────────────────────────────────────────────
+  - type: web
+    name: ascend-rwanda-backend
+    env: docker
+    region: ohio # Optional but good to co-locate both services
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: DATABASE_URL
+        value: "mysql://avnadmin:AVNS_m6ViryctHP_xdyhEpOq@mysql-14c5f053-ascendarwanda55da.d.aivencloud.com:15429/defaultdb?ssl-mode=REQUIRED"
+      - key: NODE_ENV
+        value: "production"
+      - key: JWT_SECRET
+        value: "generate_a_secure_random_string_here_or_leave_as_is_"
+      - key: ALLOWED_ORIGINS
+        # Update this value to exactly match the deployed frontend URL once known
+        value: "https://ascend-rwanda-frontend.onrender.com" 
+
+  # ─── Frontend Web Service (SPA via Nginx) ─────────────────────────────
+  - type: web
+    name: ascend-rwanda-frontend
+    env: docker
+    region: ohio
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        # This points to the deployed backend's API endpoint dynamically during Vite build
+        value: "https://ascend-rwanda-backend.onrender.com/api" 
