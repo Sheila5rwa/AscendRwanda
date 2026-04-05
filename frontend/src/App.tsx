@@ -104,6 +104,7 @@ const App: React.FC = () => {
     if (savedUser && token) {
       try {
         const parsedUser = JSON.parse(savedUser);
+        if (!parsedUser.role) throw new Error('Invalid user role');
         setRole(parsedUser.role);
         setIsAuthenticated(true);
       } catch {
