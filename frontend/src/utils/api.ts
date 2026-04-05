@@ -11,6 +11,16 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
 api.interceptors.response.use(
   (response) => {
     console.log(`[API Success] ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
