@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const isProd = import.meta.env.PROD;
-const API_URL = isProd ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:3000/api');
+const API_URL = isProd ? 'https://ascend-rwanda-backend.onrender.com/api' : 'http://localhost:3000/api';
 
 const api = axios.create({
   baseURL: API_URL,
